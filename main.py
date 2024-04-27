@@ -1,4 +1,5 @@
-from keep_alive import keep_alive
+from keep_alive_replit import keep_alive
+
 switch_flag='off'
 keep_alive()
 from datetime import *
