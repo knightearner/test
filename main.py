@@ -15,19 +15,6 @@ bnf_lot=15
 from keep_alive import keep_alive
 keep_alive()
 
-switch_flag='off'
-
-
-# def get_data(client):
-
-# def insert_data(Profit,BNF,NF,CE_LTP,PE_LTP):
-#     deta = Deta(key)
-#     users = deta.Base("option_sell_db")
-#     dt=str(datetime.now(pytz.timezone('Asia/Kolkata'))).split('.')[0]
-#     users.insert({"DateTime": str(dt),"Profit": str(Profit),"BNF": str(BNF),"NF": str(NF), "PE_LTP": str(PE_LTP),"CE_LTP": str(CE_LTP)})
-
-# def closest_index(lst, K):
-#     return min(range(len(lst)), key=lambda i: abs(lst[i] - K))
 
 def get_option_chain(client,asset):
     k=client.get_expiry("N",asset)
@@ -197,7 +184,7 @@ def option_hedge(client):
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=0)
         print('NF Long')
 
-    # get_data(client)
+
 
 
 
@@ -211,7 +198,7 @@ if __name__ == '__main__':
       while True:
         print('Running ', datetime.now(pytz.timezone('Asia/Kolkata')))
         time.sleep(10)
-        if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 9 and datetime.now(pytz.timezone('Asia/Kolkata')).minute >= 16  and switch_flag=='ON':
+        if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 9 and datetime.now(pytz.timezone('Asia/Kolkata')).minute >= 20  and switch_flag=='ON':
           option_hedge(broker)
           time.sleep(1)
         elif datetime.now(pytz.timezone('Asia/Kolkata')).hour > 9 and datetime.now(pytz.timezone('Asia/Kolkata')).hour < 16 and switch_flag=='ON':
