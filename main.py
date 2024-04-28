@@ -12,7 +12,7 @@ nf_lot=75
 bnf_lot=15
 
 
-from keep_alive import keep_alive
+from keep_alive_replit import keep_alive
 keep_alive()
 
 
