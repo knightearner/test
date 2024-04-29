@@ -7,7 +7,7 @@ import pandas as pd
 import pyotp
 from deta import Deta
 
-switch_flag = "ON"
+switch_flag = "OF"
 nf_lot=75
 bnf_lot=15
 
