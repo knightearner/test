@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <title>Position Control</title>
 </head>
 <body>
@@ -15,5 +16,13 @@
         <button type="submit">Switch OFF</button>
     </form>
 
+
+    <div id="graph"></div>
+    <script>
+        var graphJSON = {{ graph_json|safe }};
+        Plotly.newPlot('graph', graphJSON.data, graphJSON.layout);
+    </script>
+
+    
 </body>
 </html>
