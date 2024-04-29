@@ -7,22 +7,43 @@ import pandas as pd
 import pyotp
 from deta import Deta
 
-switch_flag = "ON"
+# switch_flag = "ON"
 nf_lot=75
 bnf_lot=15
 
 
+key='d0p3jsxc_jAhdkSrj194KPkx9YX8iDRZzZCBKQPfP'
+
+def get_switch():
+    deta = Deta(key)
+    users = deta.Base("switch")
+    fetch_res = users.fetch({"key": "ua1hy6g6qak6"})
+    return fetch_res.items[0]['Switch']
+
+
 def check_market_timing():
     if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 9:
-        if datetime.now(pytz.timezone('Asia/Kolkata')).minute >= 20  and switch_flag=='ON':
+        if datetime.now(pytz.timezone('Asia/Kolkata')).minute >= 20  and get_switch():
             return True
-    elif datetime.now(pytz.timezone('Asia/Kolkata')).hour > 9 and datetime.now(pytz.timezone('Asia/Kolkata')).hour < 16 and switch_flag=='ON':
+    elif datetime.now(pytz.timezone('Asia/Kolkata')).hour > 9 and datetime.now(pytz.timezone('Asia/Kolkata')).hour < 16 and get_switch():
         return True
-
     return False
+
+def squareoff_all_positions(client):
+    for pos in client.positions():
+        NetQty=pos['NetQty']
+        if NetQty>0:
+            LTP=pos['LTP']-5
+            ScripCode=int(pos['ScripCode'])
+            client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=ScripCode, Qty=NetQty, Price=LTP)
+            print('SquareOff '+pos['ScripName'])
+
+
+# https://tropical-maribel-nonenonenonenonenonenonenonenone.koyeb.app/
 
 from keep_alive_replit import keep_alive
 keep_alive()
+
 
 def closest_index(lst, K):
     return min(range(len(lst)), key=lambda i: abs(lst[i] - K))
@@ -163,7 +184,8 @@ def option_hedge(client):
 
     proceed_flag=True
     if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 15 and datetime.now(pytz.timezone('Asia/Kolkata')).minute >=20:
-        client.squareoff_all()
+        # client.squareoff_all()
+        squareoff_all_positions(client)
         proceed_flag=False
 
 
@@ -196,17 +218,22 @@ def option_hedge(client):
             
     if flag=='BNF' and open_flag !='BNF' and proceed_flag:
         open_flag='BNF'
-        client.squareoff_all()
+        # client.squareoff_all()
+        squareoff_all_positions(client)
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(BNF_ce_ScripCode), Qty=bnf_lot, Price=0)
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(NF_pe_ScripCode), Qty=nf_lot, Price=ltp_pe_option_price)
         print('BNF Long')
 
     if flag=='NF' and open_flag!='NF' and proceed_flag:
         open_flag='NF'
-        client.squareoff_all()
+        # client.squareoff_all()
+        squareoff_all_positions(client)
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(NF_ce_ScripCode), Qty=nf_lot, Price=ltp_ce_option_price)
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=0)
         print('NF Long')
+
+
+
 
 if __name__ == '__main__':
   while True:
