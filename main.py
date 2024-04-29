@@ -21,7 +21,7 @@ def check_market_timing():
 
     return False
 
-from keep_alive import keep_alive
+from keep_alive_replit import keep_alive
 keep_alive()
 
 def closest_index(lst, K):
