@@ -7,7 +7,7 @@ import pandas as pd
 import pyotp
 from deta import Deta
 
-switch_flag = "OF"
+switch_flag = "ON"
 nf_lot=75
 bnf_lot=15
 
@@ -21,10 +21,11 @@ def check_market_timing():
 
     return False
 
-
-from keep_alive_replit import keep_alive
+from keep_alive import keep_alive
 keep_alive()
 
+def closest_index(lst, K):
+    return min(range(len(lst)), key=lambda i: abs(lst[i] - K))
 
 def get_option_chain(client,asset):
     k=client.get_expiry("N",asset)
@@ -70,7 +71,6 @@ def broker_login():
 
 def option_hedge(client):
 
-    global open_flag
     time_now = datetime.now(pytz.timezone('Asia/Kolkata'))
     print('Time Now = ',time_now)
     to_ = time_now.date() + timedelta(days=2)
@@ -165,9 +165,22 @@ def option_hedge(client):
     if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 15 and datetime.now(pytz.timezone('Asia/Kolkata')).minute >=20:
         client.squareoff_all()
         proceed_flag=False
+
+
+    open_flag=''
+    for pos in client.positions():
+        # print(pos)
+        if 'BANKNIFTY' in pos['ScripName'] and 'CE'in pos['ScripName'] and pos['NetQty']>0:
+            open_flag='BNF'
+            break
+        elif 'MIDCPNIFTY' in pos['ScripName'] and 'CE'in pos['ScripName'] and pos['NetQty']>0:
+            open_flag='NF'
+            break
+        else:
+            open_flag='No_Open_Positions'
     
             
-    open_flag=''
+    
     print('open_flag = ',open_flag)
 
     req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(NF_pe_ScripCode)}]
@@ -179,6 +192,7 @@ def option_hedge(client):
     ltp_ce_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+5
 
     print(ltp_pe_option_price,ltp_ce_option_price)
+
             
     if flag=='BNF' and open_flag !='BNF' and proceed_flag:
         open_flag='BNF'
@@ -193,10 +207,6 @@ def option_hedge(client):
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(NF_ce_ScripCode), Qty=nf_lot, Price=ltp_ce_option_price)
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=0)
         print('NF Long')
-
-
-
-
 
 if __name__ == '__main__':
   while True:
