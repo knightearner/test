@@ -38,19 +38,22 @@ def update_switch_ON():
 
 
 def get_graph_data():
-  deta = Deta(key)
-  users = deta.Base("option_sell_db")
-  df=users.fetch().items
-  df=pd.DataFrame(df)
-  df['DateTime'] = pd.to_datetime(df.DateTime)
-  df=df.sort_values(by='DateTime', ascending=True)
-  today = datetime.now(pytz.timezone('Asia/Kolkata')).date()
-  today_data = df[df['DateTime'].dt.date == today]  
-  
-  today_data.Profit=today_data.Profit.apply(float)
-  # print(today_data)
+  try:
+    deta = Deta(key)
+    users = deta.Base("option_sell_db")
+    df=users.fetch().items
+    df=pd.DataFrame(df)
+    df['DateTime'] = pd.to_datetime(df.DateTime)
+    df=df.sort_values(by='DateTime', ascending=True)
+    today = datetime.now(pytz.timezone('Asia/Kolkata')).date()
+    today_data = df[df['DateTime'].dt.date == today]  
 
-  return today_data['DateTime'].to_list(),today_data.Profit.to_list()
+    today_data.Profit=today_data.Profit.apply(float)
+    # print(today_data)
+
+    return today_data['DateTime'].to_list(),today_data.Profit.to_list()
+  except:
+    return [],[]
 
 
 app = Flask('')
