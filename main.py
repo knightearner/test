@@ -7,12 +7,21 @@ import pandas as pd
 import pyotp
 from deta import Deta
 
-# switch_flag = "ON"
 nf_lot=75
 bnf_lot=15
 
+def get_BookedPL(client):
+    BookedPL=0
+    for pos in client.positions():
+        BookedPL+=pos['BookedPL']
+    return BookedPL
 
 key='d0p3jsxc_jAhdkSrj194KPkx9YX8iDRZzZCBKQPfP'
+
+def insert_val(BookedPL,bnf,nf):
+    deta = Deta(key)
+    users = deta.Base("option_sell_db")
+    users.insert({"DateTime": str(datetime.now(pytz.timezone('Asia/Kolkata'))).split('.')[0], "Profit": str(BookedPL),"BNF": str(bnf),"NF": str(nf)})
 
 def get_switch():
     deta = Deta(key)
@@ -232,6 +241,9 @@ def option_hedge(client):
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=0)
         print('NF Long')
 
+
+    BookedPL=get_BookedPL(client)
+    insert_val(BookedPL,BNF_Close,NF_Close)
 
 
 
