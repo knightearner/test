@@ -3,3 +3,5 @@ pyotp
 deta
 pytz
 flask
+plotly
+pandas
