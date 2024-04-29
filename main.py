@@ -167,7 +167,7 @@ def option_hedge(client):
         proceed_flag=False
     
             
-
+    open_flag=''
     print('open_flag = ',open_flag)
 
     req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(NF_pe_ScripCode)}]
