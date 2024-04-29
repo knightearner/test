@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objs as go
 from flask import Flask, render_template, request
 from threading import Thread
+from datetime import *
 
 key='d0p3jsxc_jAhdkSrj194KPkx9YX8iDRZzZCBKQPfP'
 
@@ -41,8 +42,14 @@ def get_graph_data():
   df=users.fetch().items
   df=pd.DataFrame(df)
   df['DateTime'] = pd.to_datetime(df.DateTime)
-  df=df.sort_values(by='DateTime', ascending=True)  
-  return df['DateTime'].to_list(),df.Profit.to_list()
+  df=df.sort_values(by='DateTime', ascending=True)
+  today = datetime.now().date()
+  today_data = df[df['DateTime'].dt.date == today]  
+  
+  today_data.Profit=today_data.Profit.apply(float)
+  # print(today_data)
+
+  return today_data['DateTime'].to_list(),today_data.Profit.to_list()
 
 
 app = Flask('')
