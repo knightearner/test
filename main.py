@@ -70,7 +70,7 @@ def broker_login():
 
 def option_hedge(client):
 
-
+    global open_flag
     time_now = datetime.now(pytz.timezone('Asia/Kolkata'))
     print('Time Now = ',time_now)
     to_ = time_now.date() + timedelta(days=2)
