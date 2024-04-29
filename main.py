@@ -12,6 +12,16 @@ nf_lot=75
 bnf_lot=15
 
 
+def check_market_timing():
+    if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 9:
+        if datetime.now(pytz.timezone('Asia/Kolkata')).minute >= 20  and switch_flag=='ON':
+            return True
+    elif datetime.now(pytz.timezone('Asia/Kolkata')).hour > 9 and datetime.now(pytz.timezone('Asia/Kolkata')).hour < 16 and switch_flag=='ON':
+        return True
+
+    return False
+
+
 from keep_alive_replit import keep_alive
 keep_alive()
 
@@ -193,17 +203,13 @@ if __name__ == '__main__':
     day_number=datetime.now(pytz.timezone('Asia/Kolkata')).weekday()
     print('Loop Time ', datetime.now(pytz.timezone('Asia/Kolkata')))
     time.sleep(10)
-    if datetime.now(pytz.timezone('Asia/Kolkata')).hour >= 9 and datetime.now(pytz.timezone('Asia/Kolkata')).hour < 16 and switch_flag=='ON' and (day_number not in [5,6]):
+    if check_market_timing() and (day_number not in [5,6]):
       broker = broker_login()
       while True:
         print('Running ', datetime.now(pytz.timezone('Asia/Kolkata')))
         time.sleep(10)
-        if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 9 and datetime.now(pytz.timezone('Asia/Kolkata')).minute >= 20  and switch_flag=='ON':
-          option_hedge(broker)
-          time.sleep(1)
-        elif datetime.now(pytz.timezone('Asia/Kolkata')).hour > 9 and datetime.now(pytz.timezone('Asia/Kolkata')).hour < 16 and switch_flag=='ON':
-          option_hedge(broker)
-          time.sleep(1)
 
+        if check_market_timing():
+            option_hedge(broker)
         else:
           break
