@@ -243,6 +243,7 @@ def option_hedge(client):
 
 
     BookedPL=get_BookedPL(client)
+    print('BookedPL = ',BookedPL)
     insert_val(BookedPL,BNF_Close,NF_Close)
 
 
