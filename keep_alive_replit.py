@@ -4,6 +4,7 @@ import plotly.graph_objs as go
 from flask import Flask, render_template, request
 from threading import Thread
 from datetime import *
+import pytz
 
 key='d0p3jsxc_jAhdkSrj194KPkx9YX8iDRZzZCBKQPfP'
 
@@ -43,7 +44,7 @@ def get_graph_data():
   df=pd.DataFrame(df)
   df['DateTime'] = pd.to_datetime(df.DateTime)
   df=df.sort_values(by='DateTime', ascending=True)
-  today = datetime.now().date()
+  today = datetime.now(pytz.timezone('Asia/Kolkata')).date()
   today_data = df[df['DateTime'].dt.date == today]  
   
   today_data.Profit=today_data.Profit.apply(float)
