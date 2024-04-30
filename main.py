@@ -14,6 +14,7 @@ def get_BookedPL(client):
     BookedPL=0
     for pos in client.positions():
         BookedPL+=pos['BookedPL']
+        BookedPL+=pos['MTOM']
     return BookedPL
 
 key='d0p3jsxc_jAhdkSrj194KPkx9YX8iDRZzZCBKQPfP'
