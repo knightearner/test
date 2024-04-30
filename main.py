@@ -7,6 +7,7 @@ import pandas as pd
 import pyotp
 from deta import Deta
 
+# switch_flag = "ON"
 nf_lot=75
 bnf_lot=15
 
@@ -14,7 +15,6 @@ def get_BookedPL(client):
     BookedPL=0
     for pos in client.positions():
         BookedPL+=pos['BookedPL']
-        BookedPL+=pos['MTOM']
     return BookedPL
 
 key='d0p3jsxc_jAhdkSrj194KPkx9YX8iDRZzZCBKQPfP'
@@ -43,7 +43,7 @@ def squareoff_all_positions(client):
     for pos in client.positions():
         NetQty=pos['NetQty']
         if NetQty>0:
-            LTP=pos['LTP']-5
+            LTP=pos['LTP']-10
             ScripCode=int(pos['ScripCode'])
             client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=ScripCode, Qty=NetQty, Price=LTP)
             print('SquareOff '+pos['ScripName'])
@@ -65,7 +65,7 @@ def get_option_chain(client,asset):
         latest_expiry.append(i['ExpiryDate'][6:19])
     # print(latest_expiry)
             
-    k = client.get_option_chain("N", asset, latest_expiry[1])
+    k = client.get_option_chain("N", asset, latest_expiry[0])
     k = (k['Options'])
     df = pd.DataFrame(k)[['CPType','LastRate','StrikeRate','ScripCode']]
     ce_df=df[df.CPType=='CE']
@@ -167,13 +167,13 @@ def option_hedge(client):
 
     print('BankNifty ++++ Option')
 
-    print("CE = ",ce_df.loc[closest_index(list(ce_df.StrikeRate), BNF_Close)].StrikeRate)
-    print("PE = ",pe_df.loc[closest_index(list(pe_df.StrikeRate), BNF_Close)].StrikeRate)
+    print("CE = ",ce_df.loc[closest_index(list(ce_df.StrikeRate), BNF_Close-100)].StrikeRate)
+    print("PE = ",pe_df.loc[closest_index(list(pe_df.StrikeRate), BNF_Close+100)].StrikeRate)
 
 
 
-    BNF_ce_ScripCode = ce_df.loc[closest_index(list(ce_df.StrikeRate), BNF_Close)].ScripCode
-    BNF_pe_ScripCode = pe_df.loc[closest_index(list(pe_df.StrikeRate), BNF_Close)].ScripCode
+    BNF_ce_ScripCode = ce_df.loc[closest_index(list(ce_df.StrikeRate), BNF_Close-100)].ScripCode
+    BNF_pe_ScripCode = pe_df.loc[closest_index(list(pe_df.StrikeRate), BNF_Close+100)].ScripCode
 
 
 
@@ -184,13 +184,13 @@ def option_hedge(client):
 
     print('Nifty ++++ Option')
 
-    print("CE = ",ce_df.loc[closest_index(list(ce_df.StrikeRate), NF_Close)].StrikeRate)
-    print("PE = ",pe_df.loc[closest_index(list(pe_df.StrikeRate), NF_Close)].StrikeRate)
+    print("CE = ",ce_df.loc[closest_index(list(ce_df.StrikeRate), NF_Close-50)].StrikeRate)
+    print("PE = ",pe_df.loc[closest_index(list(pe_df.StrikeRate), NF_Close+50)].StrikeRate)
 
 
 
-    NF_ce_ScripCode = ce_df.loc[closest_index(list(ce_df.StrikeRate), NF_Close)].ScripCode
-    NF_pe_ScripCode = pe_df.loc[closest_index(list(pe_df.StrikeRate), NF_Close)].ScripCode
+    NF_ce_ScripCode = ce_df.loc[closest_index(list(ce_df.StrikeRate), NF_Close-50)].ScripCode
+    NF_pe_ScripCode = pe_df.loc[closest_index(list(pe_df.StrikeRate), NF_Close+50)].ScripCode
 
     proceed_flag=True
     if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 15 and datetime.now(pytz.timezone('Asia/Kolkata')).minute >=20:
@@ -217,11 +217,11 @@ def option_hedge(client):
 
     req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(NF_pe_ScripCode)}]
 
-    ltp_pe_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+5
+    ltp_pe_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+10
 
     req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(NF_ce_ScripCode)}]
 
-    ltp_ce_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+5
+    ltp_ce_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+10
 
     print(ltp_pe_option_price,ltp_ce_option_price)
 
@@ -244,7 +244,6 @@ def option_hedge(client):
 
 
     BookedPL=get_BookedPL(client)
-    print('BookedPL = ',BookedPL)
     insert_val(BookedPL,BNF_Close,NF_Close)
 
 
