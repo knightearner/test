@@ -11,6 +11,40 @@ from deta import Deta
 nf_lot=75
 bnf_lot=15
 
+
+def get_profit_sma(ls_bnf,ls_nf,bnf,nf):
+    nf_lot=75/2
+    bnf_lot=15/2
+    bnf_flag=0
+    nf_flag=0    
+    profit=[]
+    change_flag='None'
+
+    for i in  range(2,len(ls_bnf)):
+        if (ls_bnf[i]>ls_nf[i]) and ~(ls_bnf[i-1]>ls_nf[i-1]):
+            if change_flag!='BNF':
+                bnf_flag=bnf[i]
+                nf_flag=nf[i]
+                change_flag='BNF'
+            bnf_pr=(bnf[i]-bnf_flag)*bnf_lot
+            nf_pr=(nf_flag-nf[i])*nf_lot
+            profit.append(bnf_pr+nf_pr)
+
+        if (ls_nf[i]>ls_bnf[i]) and ~(ls_nf[i-1]>ls_bnf[i-1]):
+            if change_flag!='NF':
+                bnf_flag=bnf[i]
+                nf_flag=nf[i]
+                change_flag='NF'
+            bnf_pr=(bnf_flag-bnf[i])*bnf_lot
+            nf_pr=(nf[i]-nf_flag)*nf_lot
+            profit.append(bnf_pr+nf_pr)
+    df=pd.DataFrame()
+    df['profit']=profit
+    df['SMA20']=df['profit'].rolling(20).mean()
+    
+    return df
+
+
 def get_BookedPL(client):
     BookedPL=0
     for pos in client.positions():
@@ -131,7 +165,9 @@ def option_hedge(client):
     
     ls_bnf=[x/st_bnf for x in bnf]
     ls_nf=[x/st_nf for x in nf]
-
+    
+    df_SMA_Flag=get_profit_sma(ls_bnf,ls_nf,bnf,nf)
+    df_SMA_Flag=df_SMA_Flag.Is_True.to_list()[-2]
 
     flag=''
 
@@ -197,6 +233,9 @@ def option_hedge(client):
         # client.squareoff_all()
         squareoff_all_positions(client)
         proceed_flag=False
+    
+    if df_SMA_Flag==False:
+        squareoff_all_positions(client)
 
 
     open_flag=''
@@ -225,8 +264,10 @@ def option_hedge(client):
 
     print(ltp_pe_option_price,ltp_ce_option_price)
 
+
+
             
-    if flag=='BNF' and open_flag !='BNF' and proceed_flag:
+    if flag=='BNF' and open_flag !='BNF' and proceed_flag and df_SMA_Flag:
         open_flag='BNF'
         # client.squareoff_all()
         squareoff_all_positions(client)
@@ -234,7 +275,7 @@ def option_hedge(client):
         client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=int(NF_pe_ScripCode), Qty=nf_lot, Price=ltp_pe_option_price)
         print('BNF Long')
 
-    if flag=='NF' and open_flag!='NF' and proceed_flag:
+    if flag=='NF' and open_flag!='NF' and proceed_flag and df_SMA_Flag:
         open_flag='NF'
         # client.squareoff_all()
         squareoff_all_positions(client)
