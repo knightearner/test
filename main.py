@@ -298,7 +298,7 @@ if __name__ == '__main__':
     day_number=datetime.now(pytz.timezone('Asia/Kolkata')).weekday()
     print('Loop Time ', datetime.now(pytz.timezone('Asia/Kolkata')))
     time.sleep(10)
-    if check_market_timing() and (day_number not in [5,6]):
+    if check_market_timing() and (day_number not in [5,6]) and get_switch():
       broker = broker_login()
       while True:
         print('Running ', datetime.now(pytz.timezone('Asia/Kolkata')))
