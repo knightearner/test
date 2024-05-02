@@ -309,7 +309,7 @@ if __name__ == '__main__':
         print('Running ', datetime.now(pytz.timezone('Asia/Kolkata')))
         time.sleep(10)
 
-        if check_market_timing():
+        if check_market_timing() and get_switch():
             option_hedge(broker)
         else:
           break
