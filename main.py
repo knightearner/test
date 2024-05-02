@@ -21,7 +21,7 @@ def get_profit_sma(ls_bnf,ls_nf,bnf,nf):
     change_flag='None'
 
     for i in  range(2,len(ls_bnf)):
-        if (ls_bnf[i]>ls_nf[i]) and ~(ls_bnf[i-1]>ls_nf[i-1]):
+        if (ls_bnf[i]>ls_nf[i]) and (ls_bnf[i-1]>ls_nf[i-1])==False:
             if change_flag!='BNF':
                 bnf_flag=bnf[i]
                 nf_flag=nf[i]
@@ -30,7 +30,7 @@ def get_profit_sma(ls_bnf,ls_nf,bnf,nf):
             nf_pr=(nf_flag-nf[i])*nf_lot
             profit.append(bnf_pr+nf_pr)
 
-        if (ls_nf[i]>ls_bnf[i]) and ~(ls_nf[i-1]>ls_bnf[i-1]):
+        if (ls_nf[i]>ls_bnf[i]) and (ls_nf[i-1]>ls_bnf[i-1])==False:
             if change_flag!='NF':
                 bnf_flag=bnf[i]
                 nf_flag=nf[i]
