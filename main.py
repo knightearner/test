@@ -41,6 +41,7 @@ def get_profit_sma(ls_bnf,ls_nf,bnf,nf):
     df=pd.DataFrame()
     df['profit']=profit
     df['SMA20']=df['profit'].rolling(20).mean()
+    df['Is_True']=df.profit>=df.SMA20
     
     return df
 
