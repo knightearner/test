@@ -171,7 +171,12 @@ def option_hedge(client):
     df_SMA_Flag=get_profit_sma(ls_bnf,ls_nf,bnf,nf)
     print(df_SMA_Flag)
     df_SMA_Flag=df_SMA_Flag.Is_True.to_list()[-2]
-    df_SMA_Flag=True
+    print('=================')
+    print('SMA Flag')
+    print(df_SMA_Flag)
+    print('=================')
+
+    # df_SMA_Flag=True
 
     flag=''
 
