@@ -12,39 +12,39 @@ nf_lot=75
 bnf_lot=15
 
 
-def get_profit_sma(ls_bnf,ls_nf,bnf,nf):
-    nf_lot=75/2
-    bnf_lot=15/2
-    bnf_flag=0
-    nf_flag=0    
-    profit=[]
-    change_flag='None'
+# def get_profit_sma(ls_bnf,ls_nf,bnf,nf):
+#     nf_lot=75/2
+#     bnf_lot=15/2
+#     bnf_flag=0
+#     nf_flag=0    
+#     profit=[]
+#     change_flag='None'
 
-    for i in  range(2,len(ls_bnf)):
-        if (ls_bnf[i]>ls_nf[i]) and (ls_bnf[i-1]>ls_nf[i-1])==False:
-            if change_flag!='BNF':
-                bnf_flag=bnf[i]
-                nf_flag=nf[i]
-                change_flag='BNF'
-            bnf_pr=(bnf[i]-bnf_flag)*bnf_lot
-            nf_pr=(nf_flag-nf[i])*nf_lot
-            profit.append(bnf_pr+nf_pr)
+#     for i in  range(2,len(ls_bnf)):
+#         if (ls_bnf[i]>ls_nf[i]) and (ls_bnf[i-1]>ls_nf[i-1])==False:
+#             if change_flag!='BNF':
+#                 bnf_flag=bnf[i]
+#                 nf_flag=nf[i]
+#                 change_flag='BNF'
+#             bnf_pr=(bnf[i]-bnf_flag)*bnf_lot
+#             nf_pr=(nf_flag-nf[i])*nf_lot
+#             profit.append(bnf_pr+nf_pr)
 
-        if (ls_nf[i]>ls_bnf[i]) and (ls_nf[i-1]>ls_bnf[i-1])==False:
-            if change_flag!='NF':
-                bnf_flag=bnf[i]
-                nf_flag=nf[i]
-                change_flag='NF'
-            bnf_pr=(bnf_flag-bnf[i])*bnf_lot
-            nf_pr=(nf[i]-nf_flag)*nf_lot
-            profit.append(bnf_pr+nf_pr)
-    df=pd.DataFrame()
-    df['profit']=profit
-    df['SMA20']=df['profit'].rolling(20).mean()
-    df.SMA20.fillna(0,inplace=True)
-    df['Is_True']=df.profit>=df.SMA20
+#         if (ls_nf[i]>ls_bnf[i]) and (ls_nf[i-1]>ls_bnf[i-1])==False:
+#             if change_flag!='NF':
+#                 bnf_flag=bnf[i]
+#                 nf_flag=nf[i]
+#                 change_flag='NF'
+#             bnf_pr=(bnf_flag-bnf[i])*bnf_lot
+#             nf_pr=(nf[i]-nf_flag)*nf_lot
+#             profit.append(bnf_pr+nf_pr)
+#     df=pd.DataFrame()
+#     df['profit']=profit
+#     df['SMA20']=df['profit'].rolling(20).mean()
+#     df.SMA20.fillna(0,inplace=True)
+#     df['Is_True']=df.profit>=df.SMA20
     
-    return df
+#     return df
 
 
 def get_BookedPL(client):
@@ -85,7 +85,6 @@ def squareoff_all_positions(client):
             print('SquareOff '+pos['ScripName'])
 
 
-# https://tropical-maribel-nonenonenonenonenonenonenonenone.koyeb.app/
 
 from keep_alive_replit import keep_alive
 keep_alive()
@@ -168,9 +167,10 @@ def option_hedge(client):
     ls_bnf=[x/st_bnf for x in bnf]
     ls_nf=[x/st_nf for x in nf]
     
-    df_SMA_Flag=get_profit_sma(ls_bnf,ls_nf,bnf,nf)
-    print(df_SMA_Flag.tail())
-    df_SMA_Flag=df_SMA_Flag.Is_True.to_list()[-2]
+    # df_SMA_Flag=get_profit_sma(ls_bnf,ls_nf,bnf,nf)
+    # print(df_SMA_Flag)
+    # df_SMA_Flag=df_SMA_Flag.Is_True.to_list()[-2]
+    df_SMA_Flag=True
 
     flag=''
 
