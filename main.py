@@ -20,7 +20,7 @@ def get_profit_sma(ls_bnf,ls_nf,bnf,nf):
     profit=[]
     change_flag='None'
 
-    for i in  range(2,len(ls_bnf)):
+    for i in  range(len(ls_bnf)):
         if (ls_bnf[i]>ls_nf[i]) :
             if change_flag!='BNF':
                 bnf_flag=bnf[i]
