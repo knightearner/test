@@ -167,6 +167,7 @@ def option_hedge(client):
     ls_nf=[x/st_nf for x in nf]
     
     df_SMA_Flag=get_profit_sma(ls_bnf,ls_nf,bnf,nf)
+    print(df_SMA_Flag.tail())
     df_SMA_Flag=df_SMA_Flag.Is_True.to_list()[-2]
 
     flag=''
