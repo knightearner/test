@@ -149,7 +149,7 @@ def option_hedge(client):
     BookedPL=get_BookedPL(client)
 
     df_SMA_Flag=True
-    if BookedPL>1500:
+    if BookedPL>2000:
         df_SMA_Flag=False
 
     flag=''
