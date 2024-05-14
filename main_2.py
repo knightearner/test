@@ -244,10 +244,10 @@ def option_hedge(client):
     open_flag=''
     for pos in client.positions():
         # print(pos)
-        if 'BANKNIFTY' in pos['ScripName'] and 'CE'in pos['ScripName'] and pos['NetQty']>0:
+        if 'RELIANCE' in pos['ScripName'] and 'CE'in pos['ScripName'] and pos['NetQty']>0:
             open_flag='BNF'
             break
-        elif 'MIDCPNIFTY' in pos['ScripName'] and 'CE'in pos['ScripName'] and pos['NetQty']>0:
+        elif 'HDFCBANK' in pos['ScripName'] and 'CE'in pos['ScripName'] and pos['NetQty']>0:
             open_flag='NF'
             break
         else:
