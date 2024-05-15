@@ -45,8 +45,8 @@ def check_market_timing():
 def squareoff_all_positions(client):
     for pos in client.positions():
         NetQty=pos['NetQty']
-        if NetQty>0:
-            LTP=pos['LTP']-10
+        if NetQty<0:
+            LTP=pos['LTP']+10
             ScripCode=int(pos['ScripCode'])
             client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=ScripCode, Qty=NetQty, Price=LTP)
             print('SquareOff '+pos['ScripName'])
@@ -229,11 +229,11 @@ def option_hedge(client):
 
     req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(NF_pe_ScripCode)}]
 
-    ltp_pe_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+10
+    ltp_pe_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])-10
 
     req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(NF_ce_ScripCode)}]
 
-    ltp_ce_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+10
+    ltp_ce_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])-10
 
     print(ltp_pe_option_price,ltp_ce_option_price)
 
