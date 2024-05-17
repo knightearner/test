@@ -28,6 +28,7 @@ def insert_val(BookedPL,bnf,nf):
     users.insert({"DateTime": str(datetime.now(pytz.timezone('Asia/Kolkata'))).split('.')[0], "Profit": str(BookedPL),"BNF": str(bnf),"NF": str(nf)})
 
 def get_switch():
+    # return 'ON'
     deta = Deta(key)
     users = deta.Base("switch")
     fetch_res = users.fetch({"key": "ua1hy6g6qak6"})
@@ -48,7 +49,7 @@ def squareoff_all_positions(client):
         if NetQty<0:
             LTP=pos['LTP']+10
             ScripCode=int(pos['ScripCode'])
-            client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=ScripCode, Qty=NetQty, Price=LTP)
+            client.place_order(OrderType='B', Exchange='N', ExchangeType='D', ScripCode=ScripCode, Qty=NetQty*-1, Price=LTP)
             print('SquareOff '+pos['ScripName'])
 
 
@@ -244,16 +245,20 @@ def option_hedge(client):
         open_flag='BNF'
         # client.squareoff_all()
         squareoff_all_positions(client)
-        client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(NF_pe_ScripCode), Qty=nf_lot, Price=ltp_pe_option_price)
-        client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(BNF_ce_ScripCode), Qty=bnf_lot, Price=0)
+        # client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(NF_pe_ScripCode), Qty=nf_lot, Price=ltp_pe_option_price)
+        # client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(BNF_ce_ScripCode), Qty=bnf_lot, Price=0)
+        client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=0)
+        client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(NF_ce_ScripCode), Qty=nf_lot, Price=ltp_ce_option_price)
         print('BNF Long')
 
     if flag=='NF' and open_flag!='NF' and proceed_flag and df_SMA_Flag:
         open_flag='NF'
         # client.squareoff_all()
         squareoff_all_positions(client)
-        client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=0)
-        client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(NF_ce_ScripCode), Qty=nf_lot, Price=ltp_ce_option_price)
+        # client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=0)
+        # client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(NF_ce_ScripCode), Qty=nf_lot, Price=ltp_ce_option_price)
+        client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(NF_pe_ScripCode), Qty=nf_lot, Price=ltp_pe_option_price)
+        client.place_order(OrderType='S', Exchange='N', ExchangeType='D', ScripCode=int(BNF_ce_ScripCode), Qty=bnf_lot, Price=0)
         print('NF Long')
 
 
