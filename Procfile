@@ -1,1 +1,1 @@
-web: python main_3.py
+web: python main_adani.py
