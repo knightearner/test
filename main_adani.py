@@ -12,6 +12,17 @@ nf_lot=400
 bnf_lot=300
 
 
+def update_switch_OFF():
+    deta = Deta(key)
+    users = deta.Base("switch")
+    users.update(
+    {
+      'Switch': 'OFF'
+    }, 'ua1hy6g6qak6')
+    
+    # fetch_res = users.fetch({"key": "ua1hy6g6qak6"})
+    # return fetch_res.items[0]['Switch']
+
 
 def get_BookedPL(client):
     BookedPL=0
@@ -51,6 +62,7 @@ def squareoff_all_positions(client):
             ScripCode=int(pos['ScripCode'])
             client.place_order(OrderType='S', Exchange='N', ExchangeType="D", ScripCode=ScripCode, Qty=NetQty, Price=LTP)
             print('SquareOff '+pos['ScripName'])
+    update_switch_OFF()
 
 
 
