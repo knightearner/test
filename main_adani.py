@@ -9,7 +9,7 @@ from deta import Deta
 
 # switch_flag = "ON"
 nf_lot=400
-bnf_lot=400
+bnf_lot=300
 
 
 
@@ -28,6 +28,7 @@ def insert_val(BookedPL,bnf,nf):
     users.insert({"DateTime": str(datetime.now(pytz.timezone('Asia/Kolkata'))).split('.')[0], "Profit": str(BookedPL),"BNF": str(bnf),"NF": str(nf)})
 
 def get_switch():
+    # return 'ON'
     deta = Deta(key)
     users = deta.Base("switch")
     fetch_res = users.fetch({"key": "ua1hy6g6qak6"})
@@ -48,7 +49,7 @@ def squareoff_all_positions(client):
         if NetQty>0:
             LTP=pos['LTP']-1
             ScripCode=int(pos['ScripCode'])
-            client.place_order(OrderType='S', Exchange='N', ExchangeType="C", ScripCode=ScripCode, Qty=NetQty, Price=LTP)
+            client.place_order(OrderType='S', Exchange='N', ExchangeType="D", ScripCode=ScripCode, Qty=NetQty, Price=LTP)
             print('SquareOff '+pos['ScripName'])
 
 
@@ -62,6 +63,7 @@ def closest_index(lst, K):
 
 def get_option_chain(client,asset):
     k=client.get_expiry("N",asset)
+    print(k)
     latest_expiry=[]
     for i in k['Expiry']:
         latest_expiry.append(i['ExpiryDate'][6:19])
@@ -175,37 +177,38 @@ def option_hedge(client):
     print('BankNifty = ',BNF_Close)
     print('Nifty = ',NF_Close)
 
-    df_option=get_option_chain(client,'INFY')
+    df_option=get_option_chain(client,'ADANIENT')
 
     ce_df=df_option[0]
     pe_df=df_option[1]
 
     print('BankNifty ++++ Option')
 
-    print("CE = ",ce_df.loc[closest_index(list(ce_df.StrikeRate), BNF_Close-100)].StrikeRate)
-    print("PE = ",pe_df.loc[closest_index(list(pe_df.StrikeRate), BNF_Close+100)].StrikeRate)
+
+    print("CE = ",ce_df.loc[closest_index(list(ce_df.StrikeRate), BNF_Close)].StrikeRate)
+    print("PE = ",pe_df.loc[closest_index(list(pe_df.StrikeRate), BNF_Close)].StrikeRate)
 
 
 
-    BNF_ce_ScripCode = ce_df.loc[closest_index(list(ce_df.StrikeRate), BNF_Close-100)].ScripCode
-    BNF_pe_ScripCode = pe_df.loc[closest_index(list(pe_df.StrikeRate), BNF_Close+100)].ScripCode
+    BNF_ce_ScripCode = ce_df.loc[closest_index(list(ce_df.StrikeRate), BNF_Close)].ScripCode
+    BNF_pe_ScripCode = pe_df.loc[closest_index(list(pe_df.StrikeRate), BNF_Close)].ScripCode
 
 
 
-    df_option=get_option_chain(client,'ADANIENT')
+    df_option=get_option_chain(client,'INFY')
 
     ce_df=df_option[0]
     pe_df=df_option[1]
 
     print('Nifty ++++ Option')
 
-    print("CE = ",ce_df.loc[closest_index(list(ce_df.StrikeRate), NF_Close-50)].StrikeRate)
-    print("PE = ",pe_df.loc[closest_index(list(pe_df.StrikeRate), NF_Close+50)].StrikeRate)
+    print("CE = ",ce_df.loc[closest_index(list(ce_df.StrikeRate), NF_Close)].StrikeRate)
+    print("PE = ",pe_df.loc[closest_index(list(pe_df.StrikeRate), NF_Close)].StrikeRate)
 
 
 
-    NF_ce_ScripCode = ce_df.loc[closest_index(list(ce_df.StrikeRate), NF_Close-50)].ScripCode
-    NF_pe_ScripCode = pe_df.loc[closest_index(list(pe_df.StrikeRate), NF_Close+50)].ScripCode
+    NF_ce_ScripCode = ce_df.loc[closest_index(list(ce_df.StrikeRate), NF_Close)].ScripCode
+    NF_pe_ScripCode = pe_df.loc[closest_index(list(pe_df.StrikeRate), NF_Close)].ScripCode
 
     proceed_flag=True
     if datetime.now(pytz.timezone('Asia/Kolkata')).hour == 15 and datetime.now(pytz.timezone('Asia/Kolkata')).minute >=20:
@@ -234,26 +237,24 @@ def option_hedge(client):
     
     print('open_flag = ',open_flag)
 
-    req_list_ = [{"Exch": "N", "ExchType": "C", "ScripCode": str(NF_pe_ScripCode)}]
+
+    req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(NF_pe_ScripCode)}]
+
 
     ltp_pe_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+1
 
-    req_list_ = [{"Exch": "N", "ExchType": "C", "ScripCode": str(NF_ce_ScripCode)}]
+    req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(NF_ce_ScripCode)}]
 
     ltp_ce_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+1
 
-    print(ltp_pe_option_price,ltp_ce_option_price)
 
+    req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(BNF_pe_ScripCode)}]
 
-    req_list_ = [{"Exch": "N", "ExchType": "C", "ScripCode": str(BNF_pe_ScripCode)}]
+    B_ltp_pe_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+1
 
-    B_ltp_pe_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+2
+    req_list_ = [{"Exch": "N", "ExchType": "D", "ScripCode": str(BNF_ce_ScripCode)}]
 
-    req_list_ = [{"Exch": "N", "ExchType": "C", "ScripCode": str(BNF_ce_ScripCode)}]
-
-    B_ltp_ce_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+2
-
-    print(B_ltp_pe_option_price,B_ltp_ce_option_price)
+    B_ltp_ce_option_price=(client.fetch_market_feed_scrip(req_list_)['Data'][0]['LastRate'])+1
 
 
 
@@ -262,16 +263,16 @@ def option_hedge(client):
         open_flag='BNF'
         # client.squareoff_all()
         squareoff_all_positions(client)
-        client.place_order(OrderType='B', Exchange='N', ExchangeType="C", ScripCode=int(BNF_ce_ScripCode), Qty=bnf_lot, Price=B_ltp_ce_option_price)
-        client.place_order(OrderType='B', Exchange='N', ExchangeType="C", ScripCode=int(NF_pe_ScripCode), Qty=nf_lot, Price=ltp_pe_option_price)
+        client.place_order(OrderType='B', Exchange='N', ExchangeType="D", ScripCode=int(BNF_ce_ScripCode), Qty=bnf_lot, Price=B_ltp_ce_option_price)
+        client.place_order(OrderType='B', Exchange='N', ExchangeType="D", ScripCode=int(NF_pe_ScripCode), Qty=nf_lot, Price=ltp_pe_option_price)
         print('BNF Long')
 
     if flag=='NF' and open_flag!='NF' and proceed_flag and df_SMA_Flag:
         open_flag='NF'
         # client.squareoff_all()
         squareoff_all_positions(client)
-        client.place_order(OrderType='B', Exchange='N', ExchangeType="C", ScripCode=int(NF_ce_ScripCode), Qty=nf_lot, Price=ltp_ce_option_price)
-        client.place_order(OrderType='B', Exchange='N', ExchangeType="C", ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=B_ltp_pe_option_price)
+        client.place_order(OrderType='B', Exchange='N', ExchangeType="D", ScripCode=int(NF_ce_ScripCode), Qty=nf_lot, Price=ltp_ce_option_price)
+        client.place_order(OrderType='B', Exchange='N', ExchangeType="D", ScripCode=int(BNF_pe_ScripCode), Qty=bnf_lot, Price=B_ltp_pe_option_price)
         print('NF Long')
 
 
